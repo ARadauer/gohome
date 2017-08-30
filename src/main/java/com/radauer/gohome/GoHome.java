@@ -20,7 +20,7 @@ public class GoHome implements Runnable {
     Image red = ImageIO.read(ClassLoader.getSystemResource("red.png"));
     Image yellow = ImageIO.read(ClassLoader.getSystemResource("yellow.png"));
 
-    int workDayDuration = (10);// (10.5*60);
+    int workDayDuration = (int) (10.5*60);
 
     private LocalDateTime lastRefresh;
     private LocalTime startWorkDay;
@@ -40,16 +40,20 @@ public class GoHome implements Runnable {
         final SystemTray tray = SystemTray.getSystemTray();
 
         // Create a pop-up menu components
-        MenuItem refreshItem = new MenuItem("Zeit neu Laden");
+        MenuItem refreshItem = new MenuItem("Arbeitsbeginn neu laden");
         refreshItem.addActionListener(e -> refreshStartTime());
+        MenuItem newTaskItem = new MenuItem("Neuer Task");
+        newTaskItem.addActionListener(e -> whatAreYouDoing.askForTask());
         MenuItem exitItem = new MenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(-1));
         popup.add(refreshItem);
+        popup.add(newTaskItem);
         popup.add(exitItem);
 
         trayIcon.setPopupMenu(popup);
         tray.add(trayIcon);
         new Thread(this).start();
+        whatAreYouDoing = new WhatAreYouDoing();
 
     }
 
@@ -57,6 +61,7 @@ public class GoHome implements Runnable {
     public static void main(String[] args) throws Exception {
 
         new GoHome();
+
 
     }
 
@@ -119,7 +124,7 @@ public class GoHome implements Runnable {
 
     private void refreshStartTime() {
         String time = JOptionPane.showInputDialog("Wann hast du heute zu arbeiten begonnen?");
-        if(time == null){
+        if (time == null) {
             return;
         }
         System.out.println(time);

@@ -29,6 +29,7 @@ public class WhatAreYouDoing implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("What are you doing?");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -46,8 +47,8 @@ public class WhatAreYouDoing implements Runnable {
         }
     }
 
-    private void askForTask() {
-        String task = JOptionPane.showInputDialog("Wann hast du heute zu arbeiten begonnen?", lastTask);
+    public void askForTask() {
+        String task = JOptionPane.showInputDialog("Was machst du gerade?", lastTask);
 
         if (lastTask == null || !lastTask.equals(task)) {
             handleNewTask(task);
