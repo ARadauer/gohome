@@ -9,6 +9,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.radauer.gohome.Settings.taskFilePath;
+import static com.radauer.gohome.Settings.taskIntervallMinutes;
+
 /**
  * Created by Andreas on 30.08.2017.
  */
@@ -16,8 +19,7 @@ public class WhatAreYouDoing implements Runnable {
 
 
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
-    private static long intervallSec = 30 * 60;
-    private File file = new File("d:/tasks.txt");
+    private File file = new File(taskFilePath);
     private LocalDateTime lastTaskStart;
     private String lastTask;
 
@@ -40,7 +42,7 @@ public class WhatAreYouDoing implements Runnable {
         while (true) {
             askForTask();
             try {
-                Thread.sleep(1000 * intervallSec);
+                Thread.sleep(1000 * taskIntervallMinutes * 60);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

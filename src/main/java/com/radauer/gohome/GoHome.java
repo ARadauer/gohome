@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import static com.radauer.gohome.Settings.*;
+
 /**
  * Created by Andreas on 06.07.2017.
  */
@@ -20,7 +22,6 @@ public class GoHome implements Runnable {
     Image red = ImageIO.read(ClassLoader.getSystemResource("red.png"));
     Image yellow = ImageIO.read(ClassLoader.getSystemResource("yellow.png"));
 
-    int workDayDuration = (int) (10.5*60);
 
     private LocalDateTime lastRefresh;
     private LocalTime startWorkDay;
@@ -68,22 +69,18 @@ public class GoHome implements Runnable {
     private void updateTrayIcon() {
 
         checkForUpdate();
-        System.out.println("Update");
-
         Duration workDuration = Duration.between(startWorkDay, LocalTime.now());
-        System.out.println("work Duration " + workDuration);
-        int minutesLeft = (int) (workDayDuration - (workDuration.getSeconds() / 60));
+        int minutesLeft = (int) (worDayDurationMinutes - (workDuration.getSeconds() / 60));
 
-        if (minutesLeft < 5) {
+        if (minutesLeft < warningBoundary) {
             if (!redWarning) {
-                trayIcon.displayMessage("Zeitüberschreitung", "Noch 5 Minuten!", TrayIcon.MessageType.ERROR);
+                trayIcon.displayMessage("Zeitüberschreitung", "Noch " + warningBoundary + " Minuten!", TrayIcon.MessageType.ERROR);
                 redWarning = true;
             }
-            System.out.println("Set red");
             trayIcon.setImage(red);
-        } else if (minutesLeft <= 30) {
+        } else if (minutesLeft <= infoBoundary) {
             if (!yellowWarning) {
-                trayIcon.displayMessage("Zeitüberschreitung", "Noch 30 Minuten!", TrayIcon.MessageType.WARNING);
+                trayIcon.displayMessage("Zeitüberschreitung", "Noch " + infoBoundary + " Minuten!", TrayIcon.MessageType.WARNING);
                 yellowWarning = true;
             }
             trayIcon.setImage(yellow);
@@ -92,7 +89,6 @@ public class GoHome implements Runnable {
         }
         int hoursLeft = minutesLeft / 60;
         minutesLeft = minutesLeft % 60;
-        System.out.println("minutes Left " + minutesLeft);
 
         trayIcon.setToolTip("Noch " + hoursLeft + ":" + ((minutesLeft < 10) ? "0" : "") + minutesLeft + " bis " + endWorkDay);
 
@@ -102,7 +98,7 @@ public class GoHome implements Runnable {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(1000 * 5);
+                Thread.sleep(1000 * 30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -131,7 +127,7 @@ public class GoHome implements Runnable {
         lastRefresh = LocalDateTime.now();
         String[] timeparts = time.split(":");
         startWorkDay = LocalTime.of(Integer.parseInt(timeparts[0]), Integer.parseInt(timeparts[1]));
-        endWorkDay = startWorkDay.plusMinutes((long) (workDayDuration));
+        endWorkDay = startWorkDay.plusMinutes((long) (worDayDurationMinutes));
         System.out.println("Started work day on: " + startWorkDay);
         System.out.println("End work day on: " + endWorkDay);
         yellowWarning = false;
