@@ -1,6 +1,5 @@
 package com.radauer.gohome;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +7,9 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import javax.swing.JOptionPane;
+
 
 import static com.radauer.gohome.Settings.taskFilePath;
 import static com.radauer.gohome.Settings.taskIntervallMinutes;
@@ -17,12 +19,11 @@ import static com.radauer.gohome.Settings.taskIntervallMinutes;
  */
 public class WhatAreYouDoing implements Runnable {
 
-
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+    private static DateTimeFormatter dateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+    private static DateTimeFormatter timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
     private File file = new File(taskFilePath);
     private LocalDateTime lastTaskStart;
     private String lastTask;
-
 
     public WhatAreYouDoing() {
         new Thread(this).start();
@@ -64,13 +65,13 @@ public class WhatAreYouDoing implements Runnable {
         if (lastTaskStart != null) {
             Duration duration = Duration.between(lastTaskStart, newTaskStart);
             System.out.println("Letzter Task hat " + printDurration(duration) + " gedauert");
-            write(";" + printDurration(duration) + "\n");
+            write(";" + printDurration(duration));
         }
         write("\r\n");
         System.out.println("starte Task " + task);
         lastTask = task;
         lastTaskStart = newTaskStart;
-        write(newTaskStart.format(dateTimeFormatter) + ";" + task);
+        write(newTaskStart.format(dateFormat) + ";" + newTaskStart.format(timeFormat) + ";" + task);
     }
 
     private void write(String text) {
