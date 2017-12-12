@@ -11,4 +11,10 @@ public class Settings {
 
     public static String taskFilePath = "d:/tasks.txt";
     public static int taskIntervallMinutes = 30;
+    public static int serverCheckIntervallSecounds = 10;
+    public static String[][] apps = {
+            {"https://cc.porscheinformatik.com/cc-at/health", "CC AT"},
+            {"https://cc.porscheinformatik.com/cc-hu/health", "CC HU"},
+            {"https://cc.porscheinformatik.com/cc-ro/health", "CC RO"}
+    };
 }

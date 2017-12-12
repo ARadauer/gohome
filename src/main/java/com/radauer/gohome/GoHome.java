@@ -3,6 +3,8 @@ package com.radauer.gohome;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -16,11 +18,16 @@ import static com.radauer.gohome.Settings.*;
 public class GoHome implements Runnable {
 
     private WhatAreYouDoing whatAreYouDoing;
+    private ServerChecker serverChecker;
 
-    Image green = ImageIO.read(ClassLoader.getSystemResource("green.png"));
-    Image blue = ImageIO.read(ClassLoader.getSystemResource("blue.png"));
-    Image red = ImageIO.read(ClassLoader.getSystemResource("red.png"));
-    Image yellow = ImageIO.read(ClassLoader.getSystemResource("yellow.png"));
+    public static Image green;
+
+    public static Image blue;
+    public static Image red;
+    public static Image yellow;
+    public static Icon upIcon;
+    public static Icon downIcon;
+
 
 
     private LocalDateTime lastRefresh;
@@ -35,32 +42,63 @@ public class GoHome implements Runnable {
 
     public GoHome() throws IOException, AWTException {
         //System.out.println(image.getGraphics().getClip().getBounds().width);
-        final PopupMenu popup = new PopupMenu();
+        final JPopupMenu popup = new JPopupMenu();
         trayIcon = new TrayIcon(blue, "");
         trayIcon.setImageAutoSize(true);
         final SystemTray tray = SystemTray.getSystemTray();
 
         // Create a pop-up menu components
-        MenuItem refreshItem = new MenuItem("Arbeitsbeginn neu laden");
+        JMenuItem refreshItem = new JMenuItem("Arbeitsbeginn neu laden");
         refreshItem.addActionListener(e -> refreshStartTime());
-        MenuItem newTaskItem = new MenuItem("Neuer Task");
+        JMenuItem newTaskItem = new JMenuItem("Neuer Task");
         newTaskItem.addActionListener(e -> whatAreYouDoing.askForTask());
-        MenuItem exitItem = new MenuItem("Exit");
+        JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(-1));
+
+
+        serverChecker = new ServerChecker();
+
+        popup.add(serverChecker.getMenuItem());
         popup.add(refreshItem);
         popup.add(newTaskItem);
         popup.add(exitItem);
 
-        trayIcon.setPopupMenu(popup);
+        //trayIcon.setPopupMenu(popup);
+        trayIcon.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.setLocation(e.getX(), e.getY());
+                    popup.setInvoker(popup);
+                    popup.setVisible(true);
+                }
+            }
+        });
         tray.add(trayIcon);
         new Thread(this).start();
         whatAreYouDoing = new WhatAreYouDoing();
+
 
     }
 
 
     public static void main(String[] args) throws Exception {
-
+        green = ImageIO.read(ClassLoader.getSystemResource("green.png"));
+        blue = ImageIO.read(ClassLoader.getSystemResource("blue.png"));
+        red = ImageIO.read(ClassLoader.getSystemResource("red.png"));
+        yellow = ImageIO.read(ClassLoader.getSystemResource("yellow.png"));
+        upIcon = new ImageIcon(green);
+        downIcon = new ImageIcon(red);
         new GoHome();
 
 
