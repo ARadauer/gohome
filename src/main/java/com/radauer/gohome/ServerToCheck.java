@@ -25,8 +25,8 @@ public class ServerToCheck extends AbstractTableModel {
         this.menuItem = menuItem;
     }
 
-    public void addMessurePoint(boolean up, int durration) {
-        measurePoints.add(new MeasurePoint(new Date(), up, durration));
+    public void addMessurePoint(boolean up, int duration) {
+        measurePoints.add(new MeasurePoint(new Date(), up, duration));
         menuItem.setIcon(up ? upIcon : downIcon);
         fireTableDataChanged();
     }
@@ -39,12 +39,8 @@ public class ServerToCheck extends AbstractTableModel {
         return name;
     }
 
-    public LimitedSizeQueue<MeasurePoint> getMeasurePoints() {
-        return measurePoints;
-    }
 
-
-    String[] columns = {"time", "status", "duration"};
+    private String[] columns = {"time", "status", "duration"};
 
     @Override
     public int getRowCount() {

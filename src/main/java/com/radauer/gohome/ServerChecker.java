@@ -1,5 +1,8 @@
 package com.radauer.gohome;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,11 +71,22 @@ public class ServerChecker implements Runnable {
 
                 long t = System.currentTimeMillis();
                 String result = Util.readUrl(server.getUrl());
-                int durration = (int) (System.currentTimeMillis() - t);
+                int duration = (int) (System.currentTimeMillis() - t);
                 boolean up = result.contains("{\"status\":\"UP\"}");
+
+
+                JSch jsch = new JSch();
+                Session session = jsch.getSession(user, host);
+                session.setPassword(password);
+                session.connect(timeout);
+                session.setPortForwardingL(listenPort, destHost, destPort);
+
+
+
+
                 System.out.println("Result from " + server.getName());
                 System.out.println(result);
-                server.addMessurePoint(up, durration);
+                server.addMessurePoint(up, duration);
                 if (!up) {
                     newUp = false;
                 }
